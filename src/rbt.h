@@ -5,8 +5,10 @@ typedef enum {
     RED, BLACK
 } Color;
 
-typedef struct {
-    Node *left;
-    Node *right;
+typedef struct _Node{
+    struct _Node *left;
+    struct _Node *right;
     Color color;
 } Node;
+
+void print(void);
