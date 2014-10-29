@@ -1,8 +1,10 @@
-#include "../src/rbt.h"
+//#include "../src/rbt.h"
+
+void insert(const char *);
 
 int main(int argc, char *argv[]) {
-    
-	printf("This is gonna be a test\n");
+
+	insert("Adam");    
 
 return 0;    
 }

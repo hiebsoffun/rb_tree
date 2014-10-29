@@ -37,9 +37,9 @@ build:
 
 # The Unit Tests
 .PHONY: tests
-tests: CFLAGS += $(TARGET)
+# tests: CFLAGS = $(TARGET)
 tests: $(TEST_SRC)
-	$(GCC) $(CFLAGS) $(TEST_SRC) -o $(TESTS_OUT)
+	$(GCC) $(CFLAGS) $(TEST_SRC) $(TARGET) -o $(TESTS_OUT)
 
 clean:
 	$(RM) $(OBJECTS_OUT) $(TESTS_OUT) $(TARGET) $(SO_TARGET) build bin
