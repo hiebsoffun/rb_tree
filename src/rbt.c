@@ -44,10 +44,17 @@ error:
 
 //---------------------------------------------------------------------------------------------------
 /*
-* An inserted node is always red. This violates maybe requirement 2.) --> repairing necessary
-* Given a Node n to be inserted, five cases have to be considered:
+* An inserted node is always red. This violates maybe req. 2.) --> repairing necessary
+* Given a Node N to be inserted, it's Uncle (U), it's parent (P) and grandparent (GP), 
+* five cases have to be considered:
 * 1.) root == NULL, (obvious)
-* 2.) The parent of n is black -> nothing to do 
+* 2.) The parent of N is black -> nothing to do
+* 3.) U and P of N is red -> color U,P black and GP red. -> req. 2.) maybe violated 
+* 	  then recursivley insert GP to the tree
+* 4.) N has non or a black U while N is the right child of his red P and P is left of GP
+*     -> left rotation around P and apply case 5.)
+* 5.) N has non or a black U and is the left child of his red P and P is left of GP.
+* 	  -> right rotation around GP. Now swap colors of former GP and P.
 */
 void insert(const char *new_name) {
 	// Is name exceeding MAX_NAME_LENGTH chars?
@@ -61,7 +68,7 @@ void insert(const char *new_name) {
 	strncpy(new_node->name, new_name, len);
 	new_node->name[len] = '\0';
 
-	// case 1
+	// case 1.)
 	if(!root) {
 		new_node->color = BLACK;
 		root = new_node;
@@ -105,7 +112,7 @@ void insert(const char *new_name) {
 		parent->right = new_node;
 	}
 
-	// In case the parent is black there is no need to balance the tree
+	// case 2.) The parent is black. There is no need to fix the tree.
 	if(parent->color == BLACK) {
 		return;
 	}
