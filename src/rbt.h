@@ -20,7 +20,6 @@ typedef struct _Node{
 } Node;
 
 void insert(const char *);
-void fix_rb_tree(Node *);
 void delete_tree();
 void print_names();
 #endif

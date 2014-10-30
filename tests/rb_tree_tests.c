@@ -5,12 +5,12 @@ int main(int argc, char *argv[]) {
 	insert("Konrad");
 	insert("Heinrich");
 	insert("Karl");
-	insert("Friedrich");
+/*	insert("Friedrich");
 	insert("Anton");
 	insert("Anette");
 	insert("Olga");
 	insert("Eva");
-	insert("Adam");
+	insert("Adam");*/
 
 	print_names();
 	delete_tree();
