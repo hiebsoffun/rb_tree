@@ -8,6 +8,8 @@
 #include <errno.h>
 #include <string.h>
 
+
+
 #ifdef NDEBUG
 #define debug(M, ...)
 #else
@@ -23,6 +25,8 @@
 #define log_info(M, ...) fprintf(stderr, "[INFO] (%s:%d) " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 
 #define check(A, M, ...) if(!(A)) { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
+
+#define check_node(A, M, ...) if(A == NIL) { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
 
 #define sentinel(M, ...)  { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
 
