@@ -6,8 +6,8 @@ int main(int argc, char *argv[]) {
 	insert("Heinrich");
 	insert("Karl");
 	insert("Friedrich");
-/*	insert("Anton");
-	insert("Anette");
+	insert("Anton");
+/*	insert("Anette");
 	insert("Olga");
 	insert("Eva");
 	insert("Adam");*/

@@ -182,7 +182,7 @@ void insert_node(
 		new_node->parent->color = BLACK;
 		uncle(new_node)->color = BLACK;
 		grandparent(new_node)->color = RED;
-		insert_node(new_node);
+		insert_node(grandparent(new_node));
 	}
 
 	// Parent and child are red. Requirement 2.) violated. -> fixing...
