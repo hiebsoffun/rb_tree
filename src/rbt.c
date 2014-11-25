@@ -37,10 +37,6 @@ static void delete_tree_rec(
 	Node *n
 );
 
-static void insert_node(
-	Node *new_node
-);
-
 static void fix_rb_tree(
 	Node *new_node
 );
@@ -97,9 +93,52 @@ void insert(
 	new_node->parent = NULL; new_node->left = NIL; new_node->right = NIL; new_node->color = RED;
 	strncpy(new_node->name, name, len);
 	new_node->name[len] = '\0';
+	
+	if(root == NULL) {
+		root = new_node;
+	} else {
+		// search for the proper place to include the node
+		Node *current = root;
+		Node *parent = root;
+		debug("Cmp %s with %s", new_node->name, root->name);
+		int res = strcmp(new_node->name, root->name);
+		if(res < 0) {
+			current = root->left;
+		} else if(res > 0) {
+			current = root->right;
+		} else {
+			// new node has the same name as root
+			// nothing to do -> free new_node and return
+			debug("Insert node: %s already exists", new_node->name);
+			free(new_node);
+			return;
+		}
+	
+		while (current != NIL) {
+			parent = current;
+			debug("Cmp %s with %s", new_node->name, root->name);
+			res = strcmp(new_node->name, current->name);
+			if(res < 0) {
+				current = current->left;
+			} else if(res > 0) {
+				current = current->right;
+			} else {
+				debug("Insert node: %s already exists", new_node->name);
+				free(new_node);
+				return;
+			}
+		}	
 
-	// insert new_node to the tree
-	insert_node(new_node);
+		// insert new node
+		new_node->parent = parent;
+		if(res < 0) {
+			parent->left = new_node;
+		} else {
+			parent->right = new_node;
+		}
+	}
+	// ensure red black tree properties
+	fix_rb_tree(new_node);
 
 error:
 	return;
@@ -119,55 +158,19 @@ error:
 * 5.) N has non or a black U and is the left child of his red P and P is left of GP.
 * 	  -> right rotation around GP. Then swap colors of former GP and P.
 */
-void insert_node(
+void fix_rb_tree(
 	Node *new_node
 ) {
-
+	debug("BLACK is %d and RED is %d", BLACK, RED);
+	check(new_node, "Insert node: new_node == NULL");
+	Node *parent = new_node->parent;
+	
 	// case 1.)
-	if(!root) {
+	if(new_node->parent == NULL) {
 		debug("Insert node: case 1.)");
 		new_node->color = BLACK;
 		root = new_node;
 		return;
-	}
-
-	// root existed
-	// search for the proper place to include the node
-	Node *current = root;
-	Node *parent = root;
-	int res = strcmp(new_node->name, root->name);
-	if(res < 0) {
-		current = root->left;
-	} else if(res > 0) {
-		current = root->right;
-	} else {
-		// new node has the same name as root
-		// nothing to do -> free new_node and return
-		debug("Insert node: %s already exists", new_node->name);
-		free(new_node);
-		return;
-	}
-	
-	while (current != NIL) {
-		parent = current;
-		res = strcmp(new_node->name, current->name);
-		if(res < 0) {
-			current = current->left;
-		} else if(res > 0) {
-			current = current->right;
-		} else {
-			debug("Insert node: %s already exists", new_node->name);
-			free(new_node);
-			return;
-		}
-	}	
-
-	// insert new node
-	new_node->parent = parent;
-	if(res < 0) {
-		parent->left = new_node;
-	} else {
-		parent->right = new_node;
 	}
 
 	// case 2.) The parent is black. There is no need to fix the tree.
@@ -179,25 +182,17 @@ void insert_node(
 	// case 3.) U and P of N is red -> color U,P black and GP red.
 	if(uncle(new_node) != NULL && uncle(new_node)->color == RED) {
 		debug("Insert node: case 3.)");
-		new_node->parent->color = BLACK;
-		uncle(new_node)->color = BLACK;
-		grandparent(new_node)->color = RED;
-		insert_node(grandparent(new_node));
+		if(grandparent(new_node)->parent != NULL) {
+			new_node->parent->color = BLACK;
+			uncle(new_node)->color = BLACK;
+			grandparent(new_node)->color = RED;
+			fix_rb_tree(grandparent(new_node));
+			return;
+		} else {
+			grandparent(new_node)->color = BLACK;
+			new_node->color = BLACK;
+		}
 	}
-
-	// Parent and child are red. Requirement 2.) violated. -> fixing...
-	fix_rb_tree(new_node);
-
-error:
-	return;
-}
-
-//--------------------------------------------------------------------------------------------------
-void fix_rb_tree(
-	Node *new_node
-) {
-	debug("Fixing tree.");
-	check(new_node, "Fixing tree: new_node == NULL");		
 
 	// case 4.) N has non or a black U while N is the right child of his red P and P is left of GP
 	if(uncle(new_node) == NIL || uncle(new_node)->color == BLACK) {
@@ -207,16 +202,18 @@ void fix_rb_tree(
 			new_node->parent == grandparent(new_node)->left
 		) {
 			debug("Fixing: case 4.) rotate left.");
-			fprintf(stdout, "******** before rotate:  new_node->parent: %s\n", new_node->parent->name);
+			debug("******** before rotate:  new_node->parent: %s ", new_node->parent->name);
 			rotate_left(new_node->parent);
 			new_node = new_node->left;
-			fprintf(stdout, "******** new_node: %s\n", new_node->name);
-			fprintf(stdout, "******** new_node->parent: %s\n", new_node->parent->name);
-			fprintf(stdout, "******** new_node->parent->left: %s\n", new_node->parent->left->name);
-			fprintf(stdout, "******** new_node->parent->right: %s\n", new_node->parent->right->name);
-			fprintf(stdout, "******** new_node->parent->parent: %s\n", new_node->parent->parent->name);
-			fprintf(stdout, "******** new_node->parent->parent->right: %s\n", new_node->parent->parent->right->name);
-			fprintf(stdout, "******** new_node->parent->parent->left: %s\n", new_node->parent->parent->left->name);
+			debug("******** new_node: %s ", new_node->name);
+			debug("******** new_node->left: %s ", new_node->left->name);
+			debug("******** new_node->right: %s ", new_node->right->name);
+			debug("******** new_node->parent: %s ", new_node->parent->name);
+			debug("******** new_node->parent->left: %s ", new_node->parent->left->name);
+			debug("******** new_node->parent->right: %s ", new_node->parent->right->name);
+			debug("******** new_node->parent->parent: %s ", new_node->parent->parent->name);
+			debug("******** new_node->parent->parent->right: %s ", new_node->parent->parent->right->name);
+			debug("******** new_node->parent->parent->left: %s ", new_node->parent->parent->left->name);
 			
 		} else if(
 					new_node == new_node->parent->left && 
@@ -225,6 +222,15 @@ void fix_rb_tree(
 			debug("Fixing: case 4.) rotate right.");
 			rotate_right(new_node->parent);
 			new_node = new_node->right;
+			debug("******** new_node: %s ", new_node->name);
+			debug("******** new_node->left: %s ", new_node->left->name);
+			debug("******** new_node->right: %s ", new_node->right->name);
+			debug("******** new_node->parent: %s ", new_node->parent->name);
+			debug("******** new_node->parent->left: %s ", new_node->parent->left->name);
+			debug("******** new_node->parent->right: %s ", new_node->parent->right->name);
+			debug("******** new_node->parent->parent: %s ", new_node->parent->parent->name);
+			debug("******** new_node->parent->parent->right: %s ", new_node->parent->parent->right->name);
+			debug("******** new_node->parent->parent->left: %s ", new_node->parent->parent->left->name);
 		}
 
 		// 5.) N has non or a black U and is the left child of his red P and P is left of GP.
@@ -234,13 +240,15 @@ void fix_rb_tree(
 				new_node->parent->color == RED &&
 				new_node->parent == grandparent(new_node)->left
 			) {
-					debug("Fixing: case 5.) rotate right.");
-			fprintf(stdout, "******** before rotate:  grandparent(new_node): %s\n", grandparent(new_node)->name);
+				debug("Fixing: case 5.) rotate right.");
+				debug("******** before rotate:  grandparent(new_node): %s ", grandparent(new_node)->name);
 				rotate_right(grandparent(new_node));
-			fprintf(stdout, "******** new_node: %s\n", new_node->name);
-			fprintf(stdout, "******** new_node->parent: %s\n", new_node->parent->name);
-			fprintf(stdout, "******** new_node->parent->left: %s\n", new_node->parent->left->name);
-			fprintf(stdout, "******** new_node->parent->right: %s\n", new_node->parent->right->name);
+				debug("******** new_node: %s ", new_node->name);
+				debug("******** new_node->left: %s ", new_node->left->name);
+				debug("******** new_node->right: %s ", new_node->right->name);
+				debug("******** new_node->parent: %s ", new_node->parent->name);
+				debug("******** new_node->parent->left: %s ", new_node->parent->left->name);
+				debug("******** new_node->parent->right: %s ", new_node->parent->right->name);
 				// swap colors of P and former GP
 				Color tmp = new_node->parent->color;
 				new_node->parent->color = new_node->parent->right->color;
@@ -307,7 +315,7 @@ void rotate_right(
 	}
 	n->left->right = n;
 	n->left = l;
-		
+	
 error:
 	return;	
 }
@@ -349,7 +357,12 @@ void print_names_rec(
 		return;
 	}
 	print_names_rec(n->left);
-	printf("%s\n", n->name);
+	char c = n->color == BLACK ? 'B' : 'R';
+	if(n != root) {
+		printf("%s %c, left: %s, right %s\n", n->name, c, n->left->name, n->right->name);
+	} else {
+		printf("%s %c root, left: %s, right %s\n", n->name, c, n->left->name, n->right->name);
+	}
 	print_names_rec(n->right);
 }
 

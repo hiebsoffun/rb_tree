@@ -4,7 +4,7 @@
 #include "dbg.h"
 #include <stdlib.h>
 
-#define MAX_NAME_LENGTH 60
+#define MAX_NAME_LENGTH 64
 
 typedef enum {
     RED, BLACK
