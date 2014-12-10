@@ -20,6 +20,7 @@ typedef struct _Node{
 } Node;
 
 void insert(const char *);
-void delete_tree();
+void delete_all();
+void delete(const char *);
 void print_names();
 #endif
