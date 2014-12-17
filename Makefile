@@ -1,4 +1,4 @@
-CFLAGS=-g -O2 -Wall -Wextra -Isrc -rdynamic $(OPTFLAGS)
+CFLAGS=-g -O2 -Wall -Wextra -Isrc -DNDEBUG -rdynamic $(OPTFLAGS)
 LIBS=-ldl $(OPTLIBS)
 GCC=gcc
 RM=rm -rf

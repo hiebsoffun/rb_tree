@@ -2,7 +2,7 @@
 
 #include "../src/rbt.h"
 
-#define N_TESTRUNS 5
+#define N_TEST_NODES 10000000
 
 typedef struct _Testrecord {
 	unsigned int n_nodes;
@@ -63,36 +63,38 @@ void test_2(void) {
     //print_names();
 }
 
-void performance_test(Testrecord *t) {
-	
+void insert_performance() {
+	unsigned long i;	
+    for(i=1; i<N_TEST_NODES+1; i++) {
+        char *s = rnd_string();
+    	if(i % 10000 == 0) {
+			time_t start, end;
+			time(&start);
+			insert(s);
+			time(&end);
+			printf("Nodes: %d, Start: %d, End: %d, Time: %f\n", i, start, end, difftime(end, start));
+		} else {
+			insert(s);
+		}
+        free(s);
+    }
+		
 }
 
-void visualize_performance() {
-	int i;
-	Testrecord records[N_TESTRUNS] = { 
-								{100, 0, 0},
-								{1000, 0, 0},
-								{10000, 0, 0},
-								{100000, 0, 0},
-								{1000000, 0, 0},
-							};
-	for(i=0; i<N_TESTRUNS; i++) {
-		performance_test(&records[i]);
-	}
-	
-
-	for(i=0; i<N_TESTRUNS; i++) {
-		printf("N: %d, Start: %d, End: %d\n", records[i].n_nodes
-											, records[i].start
-											, records[i].end);
-	}
-};
+void performance_tests() {
+	time_t start, end;
+	time(&start);
+	sleep(2);
+	time(&end);
+	printf("Diff: %lf\n", difftime(end, start));
+	insert_performance();	
+}
 
 int main() {
 
 //	test_1();
 //  test_2();
-	visualize_performance();
+	performance_tests();
     
 //	delete_all();
 
