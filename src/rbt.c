@@ -240,7 +240,7 @@ void rotate_left(
     Node *n
 ) {
     check_node(n, "Rotate left: n == NIL");
-    check_node(n->right, "Rotate left: n->right == NIL")	
+    check_node(n->right, "Rotate left: n->right == NIL");	
 	
 	Node *r = n->right;
 	if (n->parent == NULL) {
@@ -290,7 +290,7 @@ void rotate_right(
     Node *n
 ) {
     check_node(n, "Rotate right: n == NIL");
-    check_node(n->left, "Rotate right: n->left == NIL")	
+    check_node(n->left, "Rotate right: n->left == NIL");	
 
 	Node *l = n->left;
 	if (n->parent == NULL) {
